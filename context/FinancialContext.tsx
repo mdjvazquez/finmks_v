@@ -558,7 +558,7 @@ export const FinancialProvider = ({ children }: { children: ReactNode }) => {
     email: string,
     password: string,
     name?: string,
-    role?: UserRole,
+
     invitationCode?: string
   ) => {
     const { data, error } = await supabase.auth.signUp({ email, password });
@@ -566,13 +566,13 @@ export const FinancialProvider = ({ children }: { children: ReactNode }) => {
 
     if (data.user) {
       // If invitation details are provided, update the profile immediately
-      if (name || role) {
+      if (name) {
         console.log("Applying invitation details to new user...");
         const { error: updateError } = await supabase
           .from("profiles")
           .update({
             full_name: name,
-            role: role || UserRole.VIEWER,
+            role: UserRole.VIEWER,
             status: "ACTIVE",
           })
           .eq("id", data.user.id);
