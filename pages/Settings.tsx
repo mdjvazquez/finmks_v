@@ -30,6 +30,7 @@ export const Settings: React.FC = () => {
     allUsers,
     addNewUser,
     toggleUserStatus,
+    updateUserRole,
   } = useFinance();
 
   // Tab State
@@ -570,17 +571,33 @@ export const Settings: React.FC = () => {
                             {user.email}
                           </td>
                           <td className="px-6 py-4">
-                            <span
-                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            <select
+                              value={user.role}
+                              disabled={isCurrentUser}
+                              onChange={(e) =>
+                                updateUserRole(
+                                  user.id,
+                                  e.target.value as UserRole
+                                )
+                              }
+                              className={`text-xs font-medium px-2.5 py-0.5 rounded-full border-0 cursor-pointer focus:ring-2 focus:ring-blue-500 outline-none transition-colors appearance-none ${
                                 user.role === UserRole.ADMIN
-                                  ? "bg-purple-100 text-purple-800"
+                                  ? "bg-purple-100 text-purple-800 hover:bg-purple-200"
                                   : user.role === UserRole.ACCOUNTANT
-                                  ? "bg-blue-100 text-blue-800"
-                                  : "bg-gray-100 text-gray-800"
+                                  ? "bg-blue-100 text-blue-800 hover:bg-blue-200"
+                                  : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                              } ${
+                                isCurrentUser
+                                  ? "opacity-70 cursor-not-allowed"
+                                  : ""
                               }`}
                             >
-                              {user.role}
-                            </span>
+                              {Object.values(UserRole).map((role) => (
+                                <option key={role} value={role}>
+                                  {role}
+                                </option>
+                              ))}
+                            </select>
                           </td>
                           <td className="px-6 py-4">
                             <span

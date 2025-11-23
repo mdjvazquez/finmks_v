@@ -47,6 +47,7 @@ interface FinancialContextType {
     user: Partial<User>
   ) => Promise<{ success: boolean; code?: string }>;
   toggleUserStatus: (userId: string, currentStatus: string) => Promise<void>;
+  updateUserRole: (userId: string, newRole: UserRole) => Promise<void>;
 
   companySettings: CompanySettings;
   updateCompanySettings: (settings: CompanySettings) => void;
@@ -383,6 +384,28 @@ export const FinancialProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const updateUserRole = async (userId: string, newRole: UserRole) => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .update({ role: newRole })
+      .eq("id", userId)
+      .select();
+
+    if (!error) {
+      if (data && data.length > 0) {
+        setAllUsers((prev) =>
+          prev.map((u) => (u.id === userId ? { ...u, role: newRole } : u))
+        );
+        console.log(`User ${userId} role updated to ${newRole}`);
+      } else {
+        alert("Permission Denied: You cannot update this user's role.");
+      }
+    } else {
+      console.error("Error updating user role:", error);
+      alert("Failed to update user role.");
+    }
+  };
+
   // Notifications Logic
   const notifications = useMemo(() => {
     const alerts: Notification[] = [];
@@ -479,13 +502,13 @@ export const FinancialProvider = ({ children }: { children: ReactNode }) => {
 
     if (data.user) {
       // If invitation details are provided, update the profile immediately
-      if (name) {
+      if (name || role) {
         console.log("Applying invitation details to new user...");
         const { error: updateError } = await supabase
           .from("profiles")
           .update({
             full_name: name,
-            role: role,
+            role: role || UserRole.VIEWER,
             status: "ACTIVE",
           })
           .eq("id", data.user.id);
@@ -994,6 +1017,7 @@ export const FinancialProvider = ({ children }: { children: ReactNode }) => {
         toggleUserStatus,
         createInvitation,
         verifyInvitation,
+        updateUserRole,
       }}
     >
       {children}
