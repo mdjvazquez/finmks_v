@@ -35,7 +35,7 @@ interface FinancialContextType {
     email: string,
     password: string,
     name?: string,
-    role?: UserRole,
+
     invitationCode?: string
   ) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
