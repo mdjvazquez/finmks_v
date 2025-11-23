@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { useFinance } from "../context/FinancialContext";
-import { TransactionType, AccountType, ActivityGroup } from "../types";
+import { TransactionType, AccountType } from "../types";
 import {
   BarChart,
   Bar,
@@ -20,9 +20,6 @@ import {
   Bell,
   Calendar,
   XCircle,
-  Briefcase,
-  TrendingUp as TrendingIcon,
-  Landmark,
 } from "lucide-react";
 
 export const Dashboard: React.FC = () => {
@@ -107,21 +104,7 @@ export const Dashboard: React.FC = () => {
     return Object.keys(groups).map((k) => ({ name: k, value: groups[k] }));
   }, [filteredTransactions]);
 
-  // Specific Colors for Activity Groups
-  const GROUP_COLORS: Record<string, string> = {
-    [ActivityGroup.OPERATING]: "#3B82F6", // Blue-500
-    [ActivityGroup.INVESTING]: "#8B5CF6", // Violet-500
-    [ActivityGroup.FINANCING]: "#F97316", // Orange-500
-  };
-
-  const GROUP_LABELS: Record<string, string> = {
-    [ActivityGroup.OPERATING]: "Operating",
-    [ActivityGroup.INVESTING]: "Investing",
-    [ActivityGroup.FINANCING]: "Financing",
-  };
-
-  const getGroupColor = (groupName: string) =>
-    GROUP_COLORS[groupName] || "#9CA3AF"; // Default gray
+  const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
   return (
     <div className="p-8 space-y-8">
@@ -192,37 +175,6 @@ export const Dashboard: React.FC = () => {
         />
       </div>
 
-      {/* Legend Section */}
-      <div className="flex flex-wrap justify-center gap-6 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-        <div className="flex items-center gap-2">
-          <span
-            className="w-4 h-4 rounded-full"
-            style={{ backgroundColor: GROUP_COLORS[ActivityGroup.OPERATING] }}
-          ></span>
-          <span className="text-sm font-medium text-gray-700">
-            {ActivityGroup.OPERATING}
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span
-            className="w-4 h-4 rounded-full"
-            style={{ backgroundColor: GROUP_COLORS[ActivityGroup.INVESTING] }}
-          ></span>
-          <span className="text-sm font-medium text-gray-700">
-            {ActivityGroup.INVESTING}
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span
-            className="w-4 h-4 rounded-full"
-            style={{ backgroundColor: GROUP_COLORS[ActivityGroup.FINANCING] }}
-          ></span>
-          <span className="text-sm font-medium text-gray-700">
-            {ActivityGroup.FINANCING}
-          </span>
-        </div>
-      </div>
-
       {/* Pie Charts Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Income Chart */}
@@ -240,13 +192,14 @@ export const Dashboard: React.FC = () => {
                     cy="50%"
                     innerRadius={60}
                     outerRadius={80}
+                    fill="#8884d8"
                     paddingAngle={5}
                     dataKey="value"
                   >
                     {incomeChartData.map((entry, index) => (
                       <Cell
                         key={`cell-${index}`}
-                        fill={getGroupColor(entry.name)}
+                        fill={COLORS[index % COLORS.length]}
                       />
                     ))}
                   </Pie>
@@ -278,13 +231,14 @@ export const Dashboard: React.FC = () => {
                     cy="50%"
                     innerRadius={60}
                     outerRadius={80}
+                    fill="#8884d8"
                     paddingAngle={5}
                     dataKey="value"
                   >
                     {expenseChartData.map((entry, index) => (
                       <Cell
                         key={`cell-${index}`}
-                        fill={getGroupColor(entry.name)}
+                        fill={COLORS[index % COLORS.length]}
                       />
                     ))}
                   </Pie>
