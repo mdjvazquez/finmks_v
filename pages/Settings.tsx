@@ -61,6 +61,7 @@ export const Settings: React.FC = () => {
   const [newUserForm, setNewUserForm] = useState({
     name: "",
     email: "",
+    role: UserRole.VIEWER,
   });
 
   // Invitation Modal State
@@ -157,10 +158,9 @@ export const Settings: React.FC = () => {
     if (success && code) {
       setInvitationCode(code);
       setShowAddUserModal(false);
-      setNewUserForm({ name: "", email: "" });
+      setNewUserForm({ name: "", email: "", role: UserRole.VIEWER });
     } else {
       alert(t("userCreateError"));
-      console.log("Succes= " + success + " : Code= " + code);
     }
   };
 
@@ -272,7 +272,7 @@ export const Settings: React.FC = () => {
                     onClick={() => avatarInputRef.current?.click()}
                     className="text-sm text-blue-600 hover:text-blue-800 font-medium"
                   >
-                    {t("uploadPhoto")}
+                    {t("uploadLogo")}
                   </button>
                 </div>
 
@@ -799,6 +799,27 @@ export const Settings: React.FC = () => {
                     className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white text-black"
                     required
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t("role")}
+                  </label>
+                  <select
+                    value={newUserForm.role}
+                    onChange={(e) =>
+                      setNewUserForm({
+                        ...newUserForm,
+                        role: e.target.value as UserRole,
+                      })
+                    }
+                    className="w-full p-2 border rounded-lg bg-white text-black focus:ring-2 focus:ring-blue-500 outline-none"
+                  >
+                    {Object.values(UserRole).map((role) => (
+                      <option key={role} value={role}>
+                        {role}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <div className="flex gap-3 mt-6">
