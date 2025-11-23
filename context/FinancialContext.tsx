@@ -35,7 +35,7 @@ interface FinancialContextType {
     email: string,
     password: string,
     name?: string,
-
+    role?: UserRole,
     invitationCode?: string
   ) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
@@ -70,7 +70,11 @@ interface FinancialContextType {
   t: (key: string) => string;
 
   // New Invitation Methods
-  createInvitation: (email: string, name: string) => Promise<string | null>;
+  createInvitation: (
+    email: string,
+    name: string,
+    role: string
+  ) => Promise<string | null>;
   verifyInvitation: (
     code: string
   ) => Promise<{ success: boolean; data?: any; error?: string }>;
@@ -172,7 +176,7 @@ export const FinancialProvider = ({ children }: { children: ReactNode }) => {
           id: uid,
           email: email,
           full_name: "New User",
-          role: "VIEWER",
+          role: "ADMIN",
           language: "ES",
           status: "ACTIVE",
         });
@@ -182,7 +186,7 @@ export const FinancialProvider = ({ children }: { children: ReactNode }) => {
             id: uid,
             email: email,
             name: "New User",
-            role: UserRole.VIEWER,
+            role: UserRole.ADMIN,
             avatar: "",
             language: "ES",
             status: "ACTIVE",
@@ -238,9 +242,9 @@ export const FinancialProvider = ({ children }: { children: ReactNode }) => {
       setTransactions(mappedTxs);
 
       // Seed if empty
-      // if (mappedTxs.length === 0) {
-      //   seedInitialData(userId);
-      //}
+      if (mappedTxs.length === 0) {
+        seedInitialData(userId);
+      }
     }
 
     // Fetch Reports
@@ -293,7 +297,11 @@ export const FinancialProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // INVITATION LOGIC
-  const createInvitation = async (email: string, name: string) => {
+  const createInvitation = async (
+    email: string,
+    name: string,
+    role: string
+  ) => {
     // Generate 4-digit HEX code
     const code = Math.floor(Math.random() * 0xffff)
       .toString(16)
@@ -305,6 +313,7 @@ export const FinancialProvider = ({ children }: { children: ReactNode }) => {
       code,
       email,
       name,
+      role,
       expires_at: expiresAt,
     });
 
@@ -345,7 +354,7 @@ export const FinancialProvider = ({ children }: { children: ReactNode }) => {
 
   const addNewUser = async (user: Partial<User>) => {
     if (!user.email || !user.name || !user.role) return { success: false };
-    const code = await createInvitation(user.email, user.name);
+    const code = await createInvitation(user.email, user.name, user.role);
     return { success: !!code, code: code || undefined };
   };
 
@@ -549,7 +558,7 @@ export const FinancialProvider = ({ children }: { children: ReactNode }) => {
     email: string,
     password: string,
     name?: string,
-
+    role?: UserRole,
     invitationCode?: string
   ) => {
     const { data, error } = await supabase.auth.signUp({ email, password });
@@ -557,13 +566,13 @@ export const FinancialProvider = ({ children }: { children: ReactNode }) => {
 
     if (data.user) {
       // If invitation details are provided, update the profile immediately
-      if (name) {
+      if (name || role) {
         console.log("Applying invitation details to new user...");
         const { error: updateError } = await supabase
           .from("profiles")
           .update({
             full_name: name,
-            role: UserRole.VIEWER,
+            role: role || UserRole.VIEWER,
             status: "ACTIVE",
           })
           .eq("id", data.user.id);
