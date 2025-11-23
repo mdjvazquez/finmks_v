@@ -105,7 +105,7 @@ export const Login: React.FC = () => {
             <ShieldCheck className="w-10 h-10 text-blue-400" />
           </div>
           <h1 className="text-2xl font-bold text-white">FinMKS</h1>
-          <h2 className="text-2xl font-bold text-white">
+          <h2 className="font-bold text-gray-300">
             {showInvitationInput
               ? t("verifyCode")
               : isSignUp

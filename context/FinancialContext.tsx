@@ -39,7 +39,9 @@ interface FinancialContextType {
     invitationCode?: string
   ) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
-  updateUserProfile: (user: Partial<User>) => void;
+  updateUserProfile: (
+    user: Partial<User>
+  ) => Promise<{ success: boolean; error?: string }>;
   requestPasswordReset: () => Promise<string>;
   confirmPasswordChange: (code: string, newPass: string) => Promise<boolean>;
   fetchAllUsers: () => Promise<void>;
@@ -529,8 +531,10 @@ export const FinancialProvider = ({ children }: { children: ReactNode }) => {
     await supabase.auth.signOut();
   };
 
-  const updateUserProfile = async (updatedFields: Partial<User>) => {
-    if (!currentUser) return;
+  const updateUserProfile = async (
+    updatedFields: Partial<User>
+  ): Promise<{ success: boolean; error?: string }> => {
+    if (!currentUser) return { success: false, error: "User not logged in" };
 
     const updates = {
       full_name: updatedFields.name,
@@ -548,9 +552,13 @@ export const FinancialProvider = ({ children }: { children: ReactNode }) => {
     if (!error) {
       console.log("✅ Profile updated successfully:", updates);
       setCurrentUser({ ...currentUser, ...updatedFields });
+      return { success: true };
     } else {
       console.error("Update profile failed", JSON.stringify(error));
-      alert("Failed to update profile. See console.");
+      return {
+        success: false,
+        error: error.message || "Failed to update profile",
+      };
     }
   };
 
