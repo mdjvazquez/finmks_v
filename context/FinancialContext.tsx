@@ -240,11 +240,6 @@ export const FinancialProvider = ({ children }: { children: ReactNode }) => {
         receiptImage: tx.receipt_image,
       }));
       setTransactions(mappedTxs);
-
-      // Seed if empty
-      if (mappedTxs.length === 0) {
-        seedInitialData(userId);
-      }
     }
 
     // Fetch Reports
@@ -388,88 +383,6 @@ export const FinancialProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const seedInitialData = async (userId: string) => {
-    // Generate 50 transactions logic
-    const txsPayload = [];
-    const today = new Date();
-    const descriptions = [
-      {
-        d: "Consulting Services",
-        t: TransactionType.INCOME,
-        g: ActivityGroup.OPERATING,
-        a: AccountType.RECEIVABLE,
-      },
-      {
-        d: "Office Rent",
-        t: TransactionType.EXPENSE,
-        g: ActivityGroup.OPERATING,
-        a: AccountType.PAYABLE,
-      },
-      {
-        d: "Server Hosting",
-        t: TransactionType.EXPENSE,
-        g: ActivityGroup.OPERATING,
-        a: AccountType.PAYABLE,
-      },
-      {
-        d: "New Laptop",
-        t: TransactionType.EXPENSE,
-        g: ActivityGroup.INVESTING,
-        a: AccountType.CASH,
-      },
-      {
-        d: "Client Retainer",
-        t: TransactionType.INCOME,
-        g: ActivityGroup.OPERATING,
-        a: AccountType.CASH,
-      },
-    ];
-
-    for (let i = 0; i < 20; i++) {
-      const tmpl =
-        descriptions[Math.floor(Math.random() * descriptions.length)];
-      const isPast = Math.random() > 0.2;
-      const date = new Date(today);
-      date.setDate(
-        today.getDate() +
-          (isPast
-            ? -Math.floor(Math.random() * 90)
-            : Math.floor(Math.random() * 30))
-      );
-
-      let status = TransactionStatus.PAID;
-      let dueDate = null;
-
-      if (tmpl.a === AccountType.PAYABLE || tmpl.a === AccountType.RECEIVABLE) {
-        status =
-          Math.random() > 0.5
-            ? TransactionStatus.PAID
-            : TransactionStatus.PENDING;
-        const d = new Date(date);
-        d.setDate(d.getDate() + 15);
-        dueDate = d.toISOString().split("T")[0];
-      }
-
-      txsPayload.push({
-        user_id: userId,
-        date: date.toISOString().split("T")[0],
-        due_date: dueDate,
-        description: `${tmpl.d} #${1000 + i}`,
-        amount: Math.floor(Math.random() * 5000) + 100,
-        group: tmpl.g,
-        type: tmpl.t,
-        account_type: tmpl.a,
-        status: status,
-      });
-    }
-
-    const { error } = await supabase.from("transactions").insert(txsPayload);
-    if (!error) {
-      console.log("✅ Seed data inserted successfully");
-      fetchData(userId, UserRole.ADMIN); // Role doesn't matter for fetching own txs
-    }
-  };
-
   // Notifications Logic
   const notifications = useMemo(() => {
     const alerts: Notification[] = [];
@@ -566,13 +479,13 @@ export const FinancialProvider = ({ children }: { children: ReactNode }) => {
 
     if (data.user) {
       // If invitation details are provided, update the profile immediately
-      if (name || role) {
+      if (name) {
         console.log("Applying invitation details to new user...");
         const { error: updateError } = await supabase
           .from("profiles")
           .update({
             full_name: name,
-            role: role || UserRole.VIEWER,
+            role: role,
             status: "ACTIVE",
           })
           .eq("id", data.user.id);
