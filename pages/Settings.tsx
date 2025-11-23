@@ -159,7 +159,7 @@ export const Settings: React.FC = () => {
       setShowAddUserModal(false);
       setNewUserForm({ name: "", email: "" });
     } else {
-      alert(t("userCreateError"));
+      alert(t("userCreateError") + "error aqui");
     }
   };
 
