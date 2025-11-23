@@ -70,11 +70,7 @@ interface FinancialContextType {
   t: (key: string) => string;
 
   // New Invitation Methods
-  createInvitation: (
-    email: string,
-    name: string,
-    role: string
-  ) => Promise<string | null>;
+  createInvitation: (email: string, name: string) => Promise<string | null>;
   verifyInvitation: (
     code: string
   ) => Promise<{ success: boolean; data?: any; error?: string }>;
@@ -297,11 +293,7 @@ export const FinancialProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // INVITATION LOGIC
-  const createInvitation = async (
-    email: string,
-    name: string,
-    role: string
-  ) => {
+  const createInvitation = async (email: string, name: string) => {
     // Generate 4-digit HEX code
     const code = Math.floor(Math.random() * 0xffff)
       .toString(16)
@@ -313,7 +305,6 @@ export const FinancialProvider = ({ children }: { children: ReactNode }) => {
       code,
       email,
       name,
-      role,
       expires_at: expiresAt,
     });
 
@@ -354,7 +345,7 @@ export const FinancialProvider = ({ children }: { children: ReactNode }) => {
 
   const addNewUser = async (user: Partial<User>) => {
     if (!user.email || !user.name || !user.role) return { success: false };
-    const code = await createInvitation(user.email, user.name, user.role);
+    const code = await createInvitation(user.email, user.name);
     return { success: !!code, code: code || undefined };
   };
 
