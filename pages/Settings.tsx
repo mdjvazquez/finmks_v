@@ -303,7 +303,7 @@ export const Settings: React.FC = () => {
                     onClick={() => avatarInputRef.current?.click()}
                     className="text-sm text-blue-600 hover:text-blue-800 font-medium"
                   >
-                    {t("uploadLogo")}
+                    {t("uploadPhoto")}
                   </button>
                 </div>
 
