@@ -157,7 +157,7 @@ export const Settings: React.FC = () => {
     if (success && code) {
       setInvitationCode(code);
       setShowAddUserModal(false);
-      setNewUserForm({ name: "", email: "", role: UserRole.VIEWER });
+      setNewUserForm({ name: "", email: "" });
     } else {
       alert(t("userCreateError"));
     }
