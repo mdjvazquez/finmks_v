@@ -176,7 +176,7 @@ export const FinancialProvider = ({ children }: { children: ReactNode }) => {
           id: uid,
           email: email,
           full_name: "New User",
-          role: "ADMIN",
+          role: "VIEWER",
           language: "ES",
           status: "ACTIVE",
         });
@@ -186,7 +186,7 @@ export const FinancialProvider = ({ children }: { children: ReactNode }) => {
             id: uid,
             email: email,
             name: "New User",
-            role: UserRole.ADMIN,
+            role: UserRole.VIEWER,
             avatar: "",
             language: "ES",
             status: "ACTIVE",
