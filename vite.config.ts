@@ -1,4 +1,3 @@
-import path from "path";
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
@@ -24,11 +23,14 @@ export default defineConfig(({ mode }) => {
       "process.env.GEMINI_API_KEY": JSON.stringify(env.GEMINI_API_KEY),
     },
     resolve: {
-      // ⚠️ ESTA ES LA SOLUCIÓN DEFINITIVA ⚠️
-      // Esto le dice a Vite: "Al buscar librerías (como supabase),
-      // usa primero el archivo indicado en el campo 'browser' del package.json".
-      // Esto evita que entre a la carpeta 'module' rota que causaba tu error.
-      mainFields: ["browser", "module", "main"],
+      alias: {
+        // En Vite 5, este alias suele ser suficiente junto con los polyfills
+        ws: "./src/stubs/ws.js",
+      },
+    },
+    // Optimizamos para evitar que Vite se confunda con dependencias comunes
+    optimizeDeps: {
+      include: ["@supabase/supabase-js", "@supabase/realtime-js"],
     },
   };
 });
