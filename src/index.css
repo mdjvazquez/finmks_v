@@ -1,2 +1,4 @@
 @import "tailwindcss";
+@import "./typography.css";
+
 /* ... el resto de tus estilos ... */
