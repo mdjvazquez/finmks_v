@@ -16,6 +16,9 @@ import {
   Mail,
   Copy,
   Check,
+  CheckCircle,
+  AlertTriangle,
+  X,
 } from "lucide-react";
 
 export const Settings: React.FC = () => {
@@ -69,6 +72,13 @@ export const Settings: React.FC = () => {
   const [invitationCode, setInvitationCode] = useState<string | null>(null);
   const [copySuccess, setCopySuccess] = useState(false);
 
+  // Profile Save Status Modal State
+  const [statusModal, setStatusModal] = useState<{
+    open: boolean;
+    type: "success" | "error";
+    message: string;
+  }>({ open: false, type: "success", message: "" });
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
@@ -90,10 +100,30 @@ export const Settings: React.FC = () => {
     alert(t("settingsSaved"));
   };
 
-  const handleSaveProfile = (e: React.FormEvent) => {
+  const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    updateUserProfile(profileForm);
-    alert(t("settingsSaved"));
+    const { success, error } = await updateUserProfile(profileForm);
+
+    if (success) {
+      setStatusModal({
+        open: true,
+        type: "success",
+        message: t("settingsSaved"),
+      });
+    } else {
+      setStatusModal({
+        open: true,
+        type: "error",
+        message: error || "Error updating profile",
+      });
+    }
+
+    // Auto close success modal after 3 seconds
+    if (success) {
+      setTimeout(() => {
+        setStatusModal((prev) => ({ ...prev, open: false }));
+      }, 3000);
+    }
   };
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -903,6 +933,68 @@ export const Settings: React.FC = () => {
                     {copySuccess ? t("copied") : t("copyLink")}
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* STATUS MODAL (Success/Error) */}
+        {statusModal.open && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full animate-in fade-in zoom-in duration-200 relative">
+              <button
+                onClick={() =>
+                  setStatusModal((prev) => ({ ...prev, open: false }))
+                }
+                className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+              >
+                <X size={20} />
+              </button>
+              <div className="flex flex-col items-center text-center">
+                <div
+                  className={`p-3 rounded-full mb-4 ${
+                    statusModal.type === "success"
+                      ? "bg-green-100"
+                      : "bg-red-100"
+                  }`}
+                >
+                  {statusModal.type === "success" ? (
+                    <CheckCircle
+                      className={`w-8 h-8 ${
+                        statusModal.type === "success"
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }`}
+                    />
+                  ) : (
+                    <AlertTriangle className="w-8 h-8 text-red-600" />
+                  )}
+                </div>
+                <h3
+                  className={`text-lg font-bold mb-2 ${
+                    statusModal.type === "success"
+                      ? "text-gray-900"
+                      : "text-red-800"
+                  }`}
+                >
+                  {statusModal.type === "success" ? "Success" : "Error"}
+                </h3>
+                <p className="text-gray-500 mb-6 text-sm">
+                  {statusModal.message}
+                </p>
+
+                <button
+                  onClick={() =>
+                    setStatusModal((prev) => ({ ...prev, open: false }))
+                  }
+                  className={`w-full px-4 py-2 text-white rounded-lg font-medium ${
+                    statusModal.type === "success"
+                      ? "bg-green-600 hover:bg-green-700"
+                      : "bg-red-600 hover:bg-red-700"
+                  }`}
+                >
+                  {t("close")}
+                </button>
               </div>
             </div>
           </div>
