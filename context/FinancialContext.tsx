@@ -307,7 +307,7 @@ export const FinancialProvider = ({ children }: { children: ReactNode }) => {
       .padStart(4, "0");
     const expiresAt = new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString(); // 6 Hours
 
-    const { error } = await supabase.from("invitations").insert({
+    const { error } = await supabase.from("admin_codes'").insert({
       code,
       email,
       name,
@@ -329,7 +329,7 @@ export const FinancialProvider = ({ children }: { children: ReactNode }) => {
 
   const verifyInvitation = async (code: string) => {
     const { data, error } = await supabase
-      .from("invitations")
+      .from("admin_codes")
       .select("*")
       .eq("code", code)
       .single();
@@ -343,7 +343,7 @@ export const FinancialProvider = ({ children }: { children: ReactNode }) => {
 
     if (now > expires) {
       // Cleanup expired
-      await supabase.from("invitations").delete().eq("code", code);
+      await supabase.from("admin_codes").delete().eq("code", code);
       return { success: false, error: "Code Expired" };
     }
 
