@@ -1,5 +1,5 @@
 {
-  "name": "FinMKS",
+  "name": "FinMakes",
   "description": "A comprehensive financial management dashboard for businesses featuring AI-powered receipt analysis, financial statement generation (Balance Sheet, Income Statement, Cash Flow), and role-based access control.",
   "requestFramePermissions": [
     "camera",

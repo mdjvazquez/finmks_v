@@ -1,7 +1,10 @@
+
 import React, { useState } from 'react';
 import { useFinance } from '../context/FinancialContext';
-import { ReportType, FinancialReport, Transaction, TransactionType } from '../types';
-import { FileText, Sparkles, Printer, Download, Calendar, BrainCircuit, Eye, AlertCircle } from 'lucide-react';
+import { ReportType, FinancialReport, TransactionType } from '../types';
+import { FileText, Sparkles, Download, Calendar, BrainCircuit, Eye } from 'lucide-react';
+import { LoadingState } from '../components/atoms/LoadingState';
+import { ConfirmationModal } from '../components/molecules/ConfirmationModal';
 
 export const Reports: React.FC = () => {
   const { reports, generateReport, analyzeReport, isLoading, t } = useFinance();
@@ -199,37 +202,22 @@ export const Reports: React.FC = () => {
       return null;
   }
 
+  if (isLoading) {
+    return <LoadingState />;
+  }
+
   return (
     <div className="p-4 md:p-8 h-full">
-      {/* Confirmation Modal */}
-      {confirmModal.isOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 no-print">
-              <div className="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full animate-in fade-in zoom-in duration-200">
-                  <div className="flex flex-col items-center text-center">
-                      <div className="bg-blue-100 p-3 rounded-full mb-4">
-                          <AlertCircle className="w-8 h-8 text-blue-600" />
-                      </div>
-                      <h3 className="text-lg font-bold text-gray-900 mb-2">{t('confirmGenerateTitle')}</h3>
-                      <p className="text-gray-500 mb-6 text-sm">{t('confirmGenerateMsg')}</p>
-                      
-                      <div className="flex w-full gap-3">
-                          <button 
-                             onClick={() => setConfirmModal({isOpen: false})}
-                             className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium"
-                          >
-                              {t('cancel')}
-                          </button>
-                          <button 
-                             onClick={confirmGeneration}
-                             className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
-                          >
-                              {t('confirm')}
-                          </button>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      )}
+      {/* Confirmation Modal using Reusable Component */}
+      <ConfirmationModal 
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal({isOpen: false})}
+        onConfirm={confirmGeneration}
+        title={t('confirmGenerateTitle')}
+        message={t('confirmGenerateMsg')}
+        confirmText={t('confirm')}
+        cancelText={t('cancel')}
+      />
 
       <div className="flex justify-between items-center mb-6 no-print">
         <div>

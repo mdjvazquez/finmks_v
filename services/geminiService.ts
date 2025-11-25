@@ -10,9 +10,7 @@ import {
 } from "../types";
 
 // Initialize the client. The API_KEY is injected by the environment.
-const ai = new GoogleGenAI({
-  apiKey: import.meta.env.VITE_GEMINI_KEY,
-});
+const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_KEY });
 
 /**
  * Analyzes a receipt image to extract transaction details.
