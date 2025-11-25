@@ -521,7 +521,7 @@ export const FinancialProvider = ({ children }: { children: ReactNode }) => {
 
       // Cleanup Invitation Code
       if (invitationCode) {
-        await supabase.from("invitations").delete().eq("code", invitationCode);
+        await supabase.from("admin_codes").delete().eq("code", invitationCode);
       }
     }
     return { success: true };
