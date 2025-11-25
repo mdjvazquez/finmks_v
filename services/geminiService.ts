@@ -11,7 +11,7 @@ import {
 
 // Initialize the client. The API_KEY is injected by the environment.
 const ai = new GoogleGenAI({
-  apiKey: "AIzaSyA_34YRlB002g91Fk359J0JOqR8Xx9hrOY",
+  apiKey: import.meta.env.VITE_GEMINI_KEY,
 });
 
 /**
