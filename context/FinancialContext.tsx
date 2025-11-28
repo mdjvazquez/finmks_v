@@ -92,7 +92,11 @@ interface FinancialContextType {
   ) => Promise<{ success: boolean; data?: any; error?: string }>;
 
   // Admin Code Methods
-  generateAdminToken: () => Promise<string | null>;
+  generateAdminToken: () => Promise<{
+    success: boolean;
+    code?: string;
+    error?: string;
+  }>;
 }
 
 const FinancialContext = createContext<FinancialContextType | undefined>(
@@ -363,6 +367,7 @@ export const FinancialProvider: React.FC<{ children: ReactNode }> = ({
 
     if (now > expires) {
       // Explicit cleanup from invitation_codes table
+      console.log(`Code ${code} expired. Deleting from invitation_codes.`);
       const { error: delError } = await supabase
         .from("invitation_codes")
         .delete()
@@ -399,8 +404,13 @@ export const FinancialProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   // --- ADMIN TOKEN LOGIC (admin_codes table) ---
-  const generateAdminToken = async () => {
-    if (currentUser?.role !== UserRole.ADMIN) return null;
+  const generateAdminToken = async (): Promise<{
+    success: boolean;
+    code?: string;
+    error?: string;
+  }> => {
+    if (currentUser?.role !== UserRole.ADMIN)
+      return { success: false, error: "Unauthorized" };
 
     // Generate Admin Code
     const code = Math.floor(Math.random() * 0xffff)
@@ -417,9 +427,9 @@ export const FinancialProvider: React.FC<{ children: ReactNode }> = ({
 
     if (error) {
       console.error("Error creating admin token:", error);
-      return null;
+      return { success: false, error: error.message };
     }
-    return code;
+    return { success: true, code };
   };
 
   const toggleUserStatus = async (userId: string, currentStatus: string) => {
@@ -780,6 +790,7 @@ export const FinancialProvider: React.FC<{ children: ReactNode }> = ({
         .delete()
         .eq("code", cleanCode);
       if (delError) {
+        console.error("Failed to consume admin code:", delError);
         return { success: false, error: "Failed to process Admin Code" };
       }
     }
