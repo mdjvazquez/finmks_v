@@ -1,24 +1,32 @@
-
 export enum ActivityGroup {
-  OPERATING = 'OPERATING', // Actividades Operativas
-  INVESTING = 'INVESTING', // Actividades de Inversión
-  FINANCING = 'FINANCING'  // Actividades Financieras
+  OPERATING = "OPERATING", // Actividades Operativas
+  INVESTING = "INVESTING", // Actividades de Inversión
+  FINANCING = "FINANCING", // Actividades Financieras
 }
 
 export enum TransactionType {
-  INCOME = 'INCOME', // Ingreso
-  EXPENSE = 'EXPENSE' // Egreso
+  INCOME = "INCOME", // Ingreso
+  EXPENSE = "EXPENSE", // Egreso
+  TRANSFER = "TRANSFER", // Transferencia entre cajas
 }
 
 export enum AccountType {
-  CASH = 'CASH', // Efectivo / Banco inmediato
-  RECEIVABLE = 'RECEIVABLE', // Cuentas por Cobrar
-  PAYABLE = 'PAYABLE' // Cuentas por Pagar
+  CASH = "CASH", // Efectivo / Banco inmediato
+  RECEIVABLE = "RECEIVABLE", // Cuentas por Cobrar
+  PAYABLE = "PAYABLE", // Cuentas por Pagar
 }
 
 export enum TransactionStatus {
-  PENDING = 'PENDING',
-  PAID = 'PAID'
+  PENDING = "PENDING",
+  PAID = "PAID",
+}
+
+export interface CashRegister {
+  id: string;
+  name: string;
+  description?: string;
+  isDefault: boolean;
+  balance?: number; // Calculated on the fly
 }
 
 export interface Transaction {
@@ -32,12 +40,26 @@ export interface Transaction {
   accountType: AccountType;
   status: TransactionStatus;
   receiptImage?: string; // Base64
+  cashRegisterId: string; // Origin Box / Affected Box
+  // Destination removed from DB for standard transactions, kept in type for UI unification if needed
+  destinationCashRegisterId?: string;
+}
+
+// New Interface for the separate table
+export interface Transfer {
+  id: string;
+  date: string;
+  description: string;
+  amount: number;
+  originCashRegisterId: string;
+  destinationCashRegisterId: string;
+  userId: string;
 }
 
 export enum UserRole {
-  ADMIN = 'ADMIN',
-  ACCOUNTANT = 'ACCOUNTANT',
-  VIEWER = 'VIEWER'
+  ADMIN = "ADMIN",
+  ACCOUNTANT = "ACCOUNTANT",
+  VIEWER = "VIEWER",
 }
 
 export interface User {
@@ -50,8 +72,8 @@ export interface User {
   phone?: string;
   bio?: string;
   verificationCode?: string; // For password reset
-  language?: 'EN' | 'ES';
-  status?: 'ACTIVE' | 'INACTIVE';
+  language?: "EN" | "ES";
+  status?: "ACTIVE" | "INACTIVE";
 }
 
 export interface CompanySettings {
@@ -60,13 +82,13 @@ export interface CompanySettings {
   address: string;
   logoUrl: string; // Base64 or URL
   taxRate: number; // Percentage (e.g., 16 for 16%)
-  language: 'EN' | 'ES';
+  language: "EN" | "ES";
 }
 
 export enum ReportType {
-  BALANCE_SHEET = 'Balance General',
-  INCOME_STATEMENT = 'Estado de Resultados',
-  CASH_FLOW = 'Flujo de Efectivo'
+  BALANCE_SHEET = "Balance General",
+  INCOME_STATEMENT = "Estado de Resultados",
+  CASH_FLOW = "Flujo de Efectivo",
 }
 
 export interface FinancialRatio {
@@ -92,7 +114,7 @@ export interface Notification {
   id: string;
   transactionId: string;
   message: string;
-  severity: 'high' | 'medium' | 'low';
+  severity: "high" | "medium" | "low";
   date: string;
-  type: 'OVERDUE' | 'DUE_SOON' | 'UPCOMING';
+  type: "OVERDUE" | "DUE_SOON" | "UPCOMING";
 }

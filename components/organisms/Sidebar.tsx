@@ -9,6 +9,7 @@ import {
   ShieldAlert,
   Check,
   Copy,
+  Wallet,
 } from "lucide-react";
 import { useFinance } from "../../context/FinancialContext";
 import { Logo } from "../atoms/Logo";
@@ -30,6 +31,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, setPage }) => {
   const navItems = [
     { id: "dashboard", label: t("dashboard"), icon: LayoutDashboard },
     { id: "transactions", label: t("movements"), icon: Receipt },
+    { id: "cashRegisters", label: t("cashRegisters"), icon: Wallet },
     { id: "reports", label: t("reports"), icon: FileText },
     { id: "notifications", label: t("notifications"), icon: Bell },
     { id: "settings", label: t("settings"), icon: Settings },
@@ -40,6 +42,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, setPage }) => {
     if (response.success && response.code) {
       setAdminCode(response.code);
       setIsModalOpen(true);
+    } else {
+      alert(`Error: ${response.error}`);
     }
   };
 
