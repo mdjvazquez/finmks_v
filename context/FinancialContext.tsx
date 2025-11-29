@@ -402,14 +402,19 @@ export const FinancialProvider: React.FC<{ children: ReactNode }> = ({
     }
 
     if (role === UserRole.ADMIN) {
-      fetchAllUsers();
+      await fetchAllUsers();
     }
 
     setIsLoading(false);
   };
 
   const fetchAllUsers = async () => {
-    const { data, error } = await supabase.from("profiles").select("*");
+    const { data, error } = await supabase
+      .from("profiles")
+      .select(
+        "id, full_name, email, role, phone, bio, language, status, avatar_url"
+      );
+
     if (data) {
       const mappedUsers: User[] = data.map((u) => ({
         id: u.id,
@@ -893,6 +898,7 @@ export const FinancialProvider: React.FC<{ children: ReactNode }> = ({
       if (!currentUser) return;
 
       // Filter transactions for the selected period (String Comparison for robustness)
+      // Ensure strictly 'YYYY-MM-DD' formatted strings are used
       const periodTransactions = transactions.filter((t) => {
         return t.date >= startDate && t.date <= endDate;
       });
@@ -954,12 +960,12 @@ export const FinancialProvider: React.FC<{ children: ReactNode }> = ({
       } else if (type === ReportType.BALANCE_SHEET) {
         // BALANCE SHEET (Snapshot at endDate)
         // Use string comparison for date to capture all events up to end date inclusive
+        // Exclude transfers to avoid counting internal movements as global assets/liabilities
         const snapshotTransactions = transactions.filter(
           (t) => t.date <= endDate && t.type !== TransactionType.TRANSFER
         );
 
         // Cash & Equivalents: All PAID Incomes - All PAID Expenses (Global Cash)
-        // Transfers are net zero for global assets, so excluded.
         const cashAssets =
           snapshotTransactions
             .filter(

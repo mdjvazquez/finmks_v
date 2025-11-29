@@ -18,7 +18,7 @@ import {
 import { UserRole, Transaction, TransactionType, CashRegister } from "../types";
 import { ConfirmationModal } from "../components/molecules/ConfirmationModal";
 import { StatusModal } from "../components/molecules/StatusModal";
-import { TransferForm } from "../components/molecules/TransferForm";
+import { TransferForm } from "../components/molecules/TransferForm.tsx";
 import { DateFilter } from "../components/molecules/DateFilter";
 
 export const CashRegisters: React.FC = () => {

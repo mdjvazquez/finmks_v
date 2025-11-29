@@ -110,7 +110,7 @@ export const Dashboard: React.FC = () => {
     GROUP_COLORS[groupName] || "#9CA3AF"; // Default gray
 
   if (isLoading) {
-    return <LoadingState message={t("loadingAI")} />;
+    return <LoadingState />;
   }
 
   return (
