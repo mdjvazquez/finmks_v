@@ -1,44 +1,38 @@
 import React, { useState } from "react";
 import { FinancialProvider, useFinance } from "./context/FinancialContext";
 import { MainLayout } from "./components/templates/MainLayout";
-import { Dashboard } from "./pages/Dashboard";
-import { Transactions } from "./pages/Transactions";
-import { Reports } from "./pages/Reports";
 import { Settings } from "./pages/Settings";
-import { Notifications } from "./pages/Notifications";
 import { Login } from "./pages/Login";
-import { CashRegisters } from "./pages/CashRegisters";
+import { FinanceModule } from "./components/organisms/FinanceModule";
+import { HR } from "./pages/HR";
 
 const AppContent = () => {
-  const { currentUser } = useFinance();
+  const { currentUser, checkPermission } = useFinance();
   const [currentPage, setCurrentPage] = useState("dashboard");
 
   if (!currentUser) {
     return <Login />;
   }
 
-  const renderPage = () => {
+  // Routing Logic
+  const renderContent = () => {
     switch (currentPage) {
-      case "dashboard":
-        return <Dashboard />;
-      case "transactions":
-        return <Transactions />;
-      case "cashRegisters":
-        return <CashRegisters />;
-      case "reports":
-        return <Reports />;
       case "settings":
         return <Settings />;
-      case "notifications":
-        return <Notifications />;
+      case "hr":
+        return checkPermission("hr_organism.view") ? (
+          <HR />
+        ) : (
+          <div>Access Restricted</div>
+        );
       default:
-        return <Dashboard />;
+        return <FinanceModule currentView={currentPage} />;
     }
   };
 
   return (
     <MainLayout currentPage={currentPage} setPage={setCurrentPage}>
-      {renderPage()}
+      {renderContent()}
     </MainLayout>
   );
 };

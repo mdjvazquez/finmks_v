@@ -27,6 +27,7 @@ export interface CashRegister {
   description?: string;
   isDefault: boolean;
   balance?: number; // Calculated on the fly
+  companyId: string;
 }
 
 export interface Transaction {
@@ -43,6 +44,7 @@ export interface Transaction {
   cashRegisterId: string; // Origin Box / Affected Box
   // Destination removed from DB for standard transactions, kept in type for UI unification if needed
   destinationCashRegisterId?: string;
+  companyId: string;
 }
 
 // New Interface for the separate table
@@ -54,6 +56,7 @@ export interface Transfer {
   originCashRegisterId: string;
   destinationCashRegisterId: string;
   userId: string;
+  companyId: string;
 }
 
 export enum UserRole {
@@ -62,27 +65,64 @@ export enum UserRole {
   VIEWER = "VIEWER",
 }
 
+// Dynamic Role Interface from DB
+export interface AppRole {
+  id: string;
+  name: string;
+  description?: string;
+  permissions: string[]; // List of permission keys e.g. "transactions.create"
+  isSystem: boolean;
+  companyId?: string; // NULL for system roles, ID for custom roles
+}
+
+// Permission Definition Structure
+export interface PermissionModule {
+  module: string;
+  actions: string[];
+  children?: PermissionModule[];
+}
+
+export interface Company {
+  id: string;
+  name: string;
+  taxId: string;
+  address: string;
+  logoUrl: string;
+  taxRate: number;
+  createdBy: string;
+}
+
 export interface User {
   id: string;
   name: string;
-  role: UserRole;
-  avatar: string;
   email: string;
-  password?: string; // Stored locally for simulation
+  avatar: string;
   phone?: string;
   bio?: string;
-  verificationCode?: string; // For password reset
   language?: "EN" | "ES";
+  role: UserRole | string;
   status?: "ACTIVE" | "INACTIVE";
+  companyId?: string; // Direct link to company in profiles table
 }
 
-export interface CompanySettings {
-  name: string;
-  taxId: string; // RFC
-  address: string;
-  logoUrl: string; // Base64 or URL
-  taxRate: number; // Percentage (e.g., 16 for 16%)
-  language: "EN" | "ES";
+export interface Employee {
+  id: string;
+  companyId: string;
+  userId?: string; // Link to auth user if they have system access
+  firstName: string;
+  lastName: string;
+  email?: string;
+  phone?: string;
+  position?: string;
+  department?: string;
+  salary: number;
+  hireDate: string;
+  status: "ACTIVE" | "INACTIVE" | "ON_LEAVE";
+}
+
+// Legacy support alias, mapping to Company for UI components
+export interface CompanySettings extends Omit<Company, "id" | "createdBy"> {
+  language: "EN" | "ES"; // Language remains a user preference usually, or app setting
 }
 
 export enum ReportType {
@@ -108,6 +148,7 @@ export interface FinancialReport {
   data: any; // Flexible payload depending on report type
   ratios: FinancialRatio[];
   aiAnalysis?: string; // Optional, filled by AI later
+  companyId: string;
 }
 
 export interface Notification {

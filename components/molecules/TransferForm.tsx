@@ -20,7 +20,7 @@ export const TransferForm: React.FC<TransferFormProps> = ({
   onSubmit,
   onCancel,
 }) => {
-  const { cashRegisters, t } = useFinance();
+  const { cashRegisters, t, currentCompany } = useFinance();
   const [error, setError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
@@ -70,6 +70,7 @@ export const TransferForm: React.FC<TransferFormProps> = ({
       status: TransactionStatus.PAID,
       cashRegisterId: formData.originId,
       destinationCashRegisterId: formData.destinationId,
+      companyId: currentCompany?.id || "",
     };
 
     onSubmit(newTransfer);

@@ -1,4 +1,4 @@
-import { User, UserRole } from "./types";
+import { User, UserRole, PermissionModule } from "./types";
 
 // Custom SVG Avatar (Data URI)
 export const DEFAULT_USER_AVATAR =
@@ -9,7 +9,6 @@ export const MOCK_USERS: User[] = [
     id: "admin-seed",
     name: "Administrador Principal",
     email: "admin@email.com",
-    password: "admin",
     role: UserRole.ADMIN,
     avatar: DEFAULT_USER_AVATAR,
     phone: "555-0123",
@@ -21,7 +20,6 @@ export const MOCK_USERS: User[] = [
     id: "accountant-seed",
     name: "Contador",
     email: "contador@email.com",
-    password: "123456",
     role: UserRole.ACCOUNTANT,
     avatar: DEFAULT_USER_AVATAR,
     phone: "555-0456",
@@ -33,7 +31,6 @@ export const MOCK_USERS: User[] = [
     id: "viewer-seed",
     name: "Auditor",
     email: "viewer",
-    password: "123456",
     role: UserRole.VIEWER,
     avatar: DEFAULT_USER_AVATAR,
     phone: "555-0789",
@@ -48,9 +45,42 @@ export const SEED_USERS: User[] = MOCK_USERS;
 
 export const APP_NAME = "FinMakes";
 
+// DEFINITION OF AVAILABLE PERMISSIONS (Hierarchical)
+export const APP_PERMISSIONS: PermissionModule[] = [
+  {
+    module: "finances_organism",
+    actions: ["view"],
+    children: [
+      { module: "dashboard", actions: ["view"] },
+      { module: "transactions", actions: ["view", "create", "edit", "delete"] },
+      {
+        module: "cash_registers",
+        actions: ["view", "create", "edit", "delete", "transfer"],
+      },
+      { module: "reports", actions: ["view", "create"] },
+      { module: "notifications", actions: ["view"] },
+    ],
+  },
+  {
+    module: "hr_organism",
+    actions: ["view"],
+    children: [
+      { module: "employees", actions: ["view", "create", "edit", "delete"] },
+    ],
+  },
+  {
+    module: "settings",
+    actions: ["view", "manage_users", "manage_roles", "manage_company"],
+  },
+];
+
 export const TRANSLATIONS: any = {
   EN: {
     // Sidebar
+    modules: "Modules",
+    finances: "Finances",
+    hr: "Human Resources",
+    employees: "Employees",
     dashboard: "Dashboard",
     movements: "Movements",
     reports: "Financial Reports",
@@ -222,6 +252,9 @@ export const TRANSLATIONS: any = {
     confirm: "Confirm",
     transactionBreakdown: "Transaction Breakdown",
     cashFlowByRegister: "Cash Flow by Register",
+    balanceSheet: "Balance Sheet",
+    incomeStatement: "Income Statement",
+    cashFlow: "Cash Flow Statement",
 
     // Report Line Items
     r_revenues: "Revenues",
@@ -302,6 +335,15 @@ export const TRANSLATIONS: any = {
     manageUsers: "Manage company users",
     addUser: "Add User",
     role: "Role",
+    roles: "Roles",
+    manageRoles: "Manage user roles and permissions",
+    roleName: "Role Name",
+    createRole: "Create Role",
+    editRole: "Edit Role",
+    renameRole: "Rename Role",
+    roleSaved: "Role saved successfully",
+    roleDeleteConfirm: "Are you sure you want to delete this role?",
+    systemRoleCannotDelete: "System roles cannot be deleted.",
     actions: "Actions",
     userCreated: "User added successfully",
     userCreateError: "Failed to add user",
@@ -320,6 +362,9 @@ export const TRANSLATIONS: any = {
       "Are you sure you want to change the status of this user?",
     confirmRoleMsg: "Are you sure you want to change the role of this user?",
     save: "Save",
+    selectAll: "Select All",
+    deselectAll: "Deselect All",
+    updateName: "Update Name",
 
     // Invitation
     sendInvitation: "Generate Invitation Code",
@@ -330,9 +375,49 @@ export const TRANSLATIONS: any = {
     copied: "Copied!",
     close: "Close",
     invitationCode: "Invitation Code",
+
+    // Employees
+    manageEmployees: "Manage Employees",
+    employeesDesc: "Track your team, positions, and basic HR information.",
+    addEmployee: "Add Employee",
+    editEmployee: "Edit Employee",
+    firstName: "First Name",
+    lastName: "Last Name",
+    position: "Position",
+    department: "Department",
+    salary: "Salary",
+    hireDate: "Hire Date",
+    employeeSaved: "Employee saved successfully!",
+    deleteEmployeeConfirm: "Are you sure you want to remove this employee?",
+    noEmployees: "No employees found.",
+    onLeave: "On Leave",
+
+    // Permissions Modules
+    perm_finances_organism: "Finances Module",
+    perm_hr_organism: "HR Module",
+    perm_dashboard: "Dashboard",
+    perm_transactions: "Financial Movements",
+    perm_cash_registers: "Cash Registers",
+    perm_reports: "Reports",
+    perm_notifications: "Notifications",
+    perm_settings: "Settings",
+    perm_employees: "Employees",
+    // Permissions Actions
+    perm_view: "View",
+    perm_create: "Create",
+    perm_edit: "Edit",
+    perm_delete: "Delete",
+    perm_transfer: "Transfer",
+    perm_manage_users: "Manage Users",
+    perm_manage_roles: "Manage Roles",
+    perm_manage_company: "Manage Company",
   },
   ES: {
     // Sidebar
+    modules: "Módulos",
+    finances: "Finanzas",
+    hr: "Recursos Humanos",
+    employees: "Empleados",
     dashboard: "Panel Principal",
     movements: "Movimientos",
     reports: "Estados Financieros",
@@ -508,6 +593,9 @@ export const TRANSLATIONS: any = {
     confirm: "Confirmar",
     transactionBreakdown: "Desglose de Movimientos",
     cashFlowByRegister: "Flujo de Efectivo por Caja",
+    balanceSheet: "Balance General",
+    incomeStatement: "Estado de Resultados",
+    cashFlow: "Flujo de Efectivo",
 
     // Report Line Items
     r_revenues: "Ingresos",
@@ -580,7 +668,7 @@ export const TRANSLATIONS: any = {
     newPassword: "Nueva Contraseña",
     codeSent: "¡Código enviado!",
     codeSentDesc:
-      "Por favor revisa tu correo (simulado en alerta) para obtener el código de 6 dígitos.",
+      "Por favor revisa tu correo (simulated en alerta) para obtener el código de 6 dígitos.",
     passwordChanged: "¡Contraseña actualizada exitosamente!",
     invalidCode: "Código de verificación inválido.",
     verifyAndSave: "Verificar y Cambiar",
@@ -588,6 +676,15 @@ export const TRANSLATIONS: any = {
     manageUsers: "Administrar usuarios de la empresa",
     addUser: "Agregar Usuario",
     role: "Rol",
+    roles: "Roles",
+    manageRoles: "Administrar roles y permisos de usuario",
+    roleName: "Nombre del Rol",
+    createRole: "Crear Rol",
+    editRole: "Editar Rol",
+    renameRole: "Renombrar Rol",
+    roleSaved: "Rol guardado exitosamente",
+    roleDeleteConfirm: "¿Estás seguro de que deseas eliminar este rol?",
+    systemRoleCannotDelete: "Los roles del sistema no se pueden eliminar.",
     actions: "Acciones",
     userCreated: "Usuario creado exitosamente",
     userCreateError: "Error al crear usuario",
@@ -606,6 +703,9 @@ export const TRANSLATIONS: any = {
     confirmRoleMsg:
       "¿Estás seguro de que deseas cambiar el rol de este usuario?",
     save: "Guardar",
+    selectAll: "Seleccionar Todo",
+    deselectAll: "Deseleccionar Todo",
+    updateName: "Actualizar Nombre",
 
     // Invitation
     sendInvitation: "Generar Código de Invitación",
@@ -616,5 +716,42 @@ export const TRANSLATIONS: any = {
     copied: "¡Copiado!",
     close: "Cerrar",
     invitationCode: "Código de Invitación",
+
+    // Employees
+    manageEmployees: "Administrar Empleados",
+    employeesDesc: "Gestiona tu equipo, cargos e información básica de RH.",
+    addEmployee: "Agregar Empleado",
+    editEmployee: "Editar Empleado",
+    firstName: "Nombre",
+    lastName: "Apellidos",
+    position: "Cargo",
+    department: "Departamento",
+    salary: "Salario",
+    hireDate: "Fecha de Contratación",
+    employeeSaved: "¡Empleado guardado exitosamente!",
+    deleteEmployeeConfirm:
+      "¿Estás seguro de que deseas eliminar a este empleado?",
+    noEmployees: "No se encontraron empleados.",
+    onLeave: "De Vacaciones/Permiso",
+
+    // Permissions Modules
+    perm_finances_organism: "Módulo de Finanzas",
+    perm_hr_organism: "Módulo de RH",
+    perm_dashboard: "Panel Principal",
+    perm_transactions: "Movimientos Financieros",
+    perm_cash_registers: "Cajas",
+    perm_reports: "Reportes",
+    perm_notifications: "Notificaciones",
+    perm_settings: "Ajustes",
+    perm_employees: "Empleados",
+    // Permissions Actions
+    perm_view: "Ver",
+    perm_create: "Crear",
+    perm_edit: "Editar",
+    perm_delete: "Eliminar",
+    perm_transfer: "Transferir",
+    perm_manage_users: "Gestionar Usuarios",
+    perm_manage_roles: "Gestionar Roles",
+    perm_manage_company: "Gestionar Empresa",
   },
 };

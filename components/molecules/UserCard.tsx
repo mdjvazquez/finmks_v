@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { User, UserRole } from "../../types";
+import { User, UserRole, AppRole } from "../../types";
 import { Power, Save } from "lucide-react";
 import { ConfirmationModal } from "./ConfirmationModal";
 import { DEFAULT_USER_AVATAR } from "../../constants";
@@ -7,6 +7,7 @@ import { DEFAULT_USER_AVATAR } from "../../constants";
 interface UserCardProps {
   user: User;
   currentUser: User | null;
+  roles: AppRole[]; // Dynamic roles list
   t: (key: string) => string;
   onUpdateRole: (userId: string, newRole: UserRole) => void;
   onToggleStatus: (userId: string, currentStatus: string) => void;
@@ -19,6 +20,7 @@ interface UserCardProps {
 export const UserCard: React.FC<UserCardProps> = ({
   user,
   currentUser,
+  roles,
   t,
   onUpdateRole,
   onToggleStatus,
@@ -134,18 +136,16 @@ export const UserCard: React.FC<UserCardProps> = ({
               disabled={isCurrentUser || !isAdmin}
               onChange={(e) => handleRoleChange(e.target.value)}
               className={`text-xs font-bold px-3 py-1.5 rounded-lg border-0 cursor-pointer focus:ring-2 focus:ring-blue-500 outline-none transition-all appearance-none shadow-sm ${
-                user.role === UserRole.ADMIN
+                user.role === "ADMIN"
                   ? "bg-purple-100 text-purple-800 hover:bg-purple-200"
-                  : user.role === UserRole.ACCOUNTANT
-                  ? "bg-blue-100 text-blue-800 hover:bg-blue-200"
                   : "bg-gray-100 text-gray-800 hover:bg-gray-200"
               } ${
                 isCurrentUser || !isAdmin ? "opacity-70 cursor-not-allowed" : ""
               }`}
             >
-              {Object.values(UserRole).map((role) => (
-                <option key={role} value={role}>
-                  {role}
+              {roles.map((role) => (
+                <option key={role.id} value={role.name}>
+                  {role.name}
                 </option>
               ))}
             </select>

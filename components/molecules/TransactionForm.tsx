@@ -22,7 +22,8 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
   onSubmit,
   onCancel,
 }) => {
-  const { companySettings, currentUser, t, cashRegisters } = useFinance();
+  const { companySettings, currentUser, t, cashRegisters, currentCompany } =
+    useFinance();
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [addTax, setAddTax] = useState(false);
@@ -150,6 +151,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
       status: formData.status as TransactionStatus,
       receiptImage: formData.receiptImage,
       cashRegisterId: formData.cashRegisterId,
+      companyId: currentCompany?.id || "",
     };
 
     onSubmit(newTransaction);

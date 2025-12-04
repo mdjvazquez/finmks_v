@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   LayoutDashboard,
   Receipt,
@@ -10,6 +10,11 @@ import {
   Check,
   Copy,
   Wallet,
+  ChevronDown,
+  ChevronRight,
+  Briefcase,
+  Package,
+  Users,
 } from "lucide-react";
 import { useFinance } from "../../context/FinancialContext";
 import { Logo } from "../atoms/Logo";
@@ -23,19 +28,37 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ currentPage, setPage }) => {
-  const { currentUser, logout, t, generateAdminToken } = useFinance();
+  const { currentUser, logout, t, generateAdminToken, checkPermission } =
+    useFinance();
   const [adminCode, setAdminCode] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const navItems = [
+  const [isFinancesOpen, setIsFinancesOpen] = useState(true);
+  const [isHrOpen, setIsHrOpen] = useState(false);
+
+  // Permissions
+  const canViewFinances = checkPermission("finances_organism.view");
+  const canViewHr = checkPermission("hr_organism.view");
+
+  const financeItems = [
     { id: "dashboard", label: t("dashboard"), icon: LayoutDashboard },
     { id: "transactions", label: t("movements"), icon: Receipt },
     { id: "cashRegisters", label: t("cashRegisters"), icon: Wallet },
     { id: "reports", label: t("reports"), icon: FileText },
     { id: "notifications", label: t("notifications"), icon: Bell },
-    { id: "settings", label: t("settings"), icon: Settings },
   ];
+
+  const hrItems = [{ id: "hr", label: t("employees"), icon: Users }];
+
+  // Auto-expand logic
+  useEffect(() => {
+    const financePageIds = financeItems.map((i) => i.id);
+    if (financePageIds.includes(currentPage)) setIsFinancesOpen(true);
+
+    const hrPageIds = hrItems.map((i) => i.id);
+    if (hrPageIds.includes(currentPage)) setIsHrOpen(true);
+  }, [currentPage]);
 
   const handleGenerateToken = async () => {
     const response = await generateAdminToken();
@@ -65,23 +88,115 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, setPage }) => {
           </h1>
         </div>
 
-        <div className="flex-1 py-6 px-4 space-y-2">
-          {navItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setPage(item.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                currentPage === item.id
-                  ? "bg-blue-600 text-white shadow-lg"
-                  : "text-slate-400 hover:bg-slate-800 hover:text-white"
-              }`}
-            >
-              <item.icon size={20} />
-              <span className="font-medium">{item.label}</span>
-            </button>
-          ))}
+        <div className="flex-1 py-6 px-4 space-y-1 overflow-y-auto">
+          {/* MODULES HEADER */}
+          <div className="px-3 mb-2 text-xs font-bold text-gray-500 uppercase tracking-wider">
+            {t("modules")}
+          </div>
+
+          {/* FINANCE MODULE GROUP (ORGANISM) */}
+          {canViewFinances && (
+            <div className="mb-2">
+              <button
+                onClick={() => setIsFinancesOpen(!isFinancesOpen)}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-colors text-sm font-medium ${
+                  isFinancesOpen
+                    ? "text-white bg-slate-800"
+                    : "text-slate-400 hover:text-white hover:bg-slate-800"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Briefcase size={20} className="text-blue-400" />
+                  <span>{t("finances")}</span>
+                </div>
+                {isFinancesOpen ? (
+                  <ChevronDown size={16} />
+                ) : (
+                  <ChevronRight size={16} />
+                )}
+              </button>
+
+              {isFinancesOpen && (
+                <div className="mt-1 ml-4 space-y-1 pl-2 border-l border-slate-700">
+                  {financeItems.map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => setPage(item.id)}
+                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm ${
+                        currentPage === item.id
+                          ? "bg-blue-600/20 text-blue-300 font-semibold"
+                          : "text-slate-400 hover:text-white hover:bg-slate-700/50"
+                      }`}
+                    >
+                      <item.icon size={18} />
+                      <span>{item.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* HR MODULE GROUP (ORGANISM) */}
+          {canViewHr && (
+            <div className="mb-2">
+              <button
+                onClick={() => setIsHrOpen(!isHrOpen)}
+                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-colors text-sm font-medium ${
+                  isHrOpen
+                    ? "text-white bg-slate-800"
+                    : "text-slate-400 hover:text-white hover:bg-slate-800"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Users size={20} className="text-purple-400" />
+                  <span>{t("hr")}</span>
+                </div>
+                {isHrOpen ? (
+                  <ChevronDown size={16} />
+                ) : (
+                  <ChevronRight size={16} />
+                )}
+              </button>
+
+              {isHrOpen && (
+                <div className="mt-1 ml-4 space-y-1 pl-2 border-l border-slate-700">
+                  {hrItems.map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => setPage(item.id)}
+                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm ${
+                        currentPage === item.id
+                          ? "bg-purple-600/20 text-purple-300 font-semibold"
+                          : "text-slate-400 hover:text-white hover:bg-slate-700/50"
+                      }`}
+                    >
+                      <item.icon size={18} />
+                      <span>{item.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="my-4 border-t border-slate-700 mx-2"></div>
+
+          {/* SETTINGS ITEM */}
+          <button
+            onClick={() => setPage("settings")}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium ${
+              currentPage === "settings"
+                ? "bg-blue-600 text-white shadow-lg"
+                : "text-slate-400 hover:bg-slate-800 hover:text-white"
+            }`}
+          >
+            <Settings size={20} />
+            <span>{t("settings")}</span>
+          </button>
         </div>
 
+        {/* FOOTER */}
         <div className="p-4 border-t border-slate-700 bg-slate-900 space-y-3">
           {currentUser?.role === UserRole.ADMIN && (
             <button
@@ -101,7 +216,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, setPage }) => {
                 className="w-8 h-8 rounded-full bg-slate-800 object-cover"
               />
             ) : (
-              <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-xs font-bold">
+              <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-xs font-bold">
                 {currentUser?.name?.charAt(0)}
               </div>
             )}
